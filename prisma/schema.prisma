@@ -6,6 +6,15 @@ generator erd {
   provider = "prisma-erd-generator"
   output   = "../docs/erd.svg"
   theme    = "forest"
+  // Ruta a un archivo JSON con las opciones de Puppeteer.launch() — no
+  // acepta un objeto inline aca, el generador exige la ruta a un archivo
+  // que exista (ver node_modules/prisma-erd-generator/README.md).
+  // OJO: a diferencia de `output`, esta ruta NO se resuelve relativa a
+  // este schema.prisma, sino relativa al cwd desde donde se corre
+  // `prisma generate` (la raiz del repo en nuestros scripts de npm).
+  // --no-sandbox es necesario porque el runner de GitHub Actions no
+  // expone el sandbox de Chromium sin privilegios adicionales.
+  puppeteerConfig = "./prisma/erd-puppeteer.config.json"
 }
 
 datasource db {
