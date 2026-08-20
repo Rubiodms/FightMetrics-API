@@ -1,0 +1,22 @@
+services:
+  api:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+
+  # Servicio opcional para pruebas prod-like con Postgres.
+  # postgres:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: fightmetrics
+  #     POSTGRES_PASSWORD: fightmetrics
+  #     POSTGRES_DB: fightmetrics
+  #   ports:
+  #     - '5432:5432'
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:

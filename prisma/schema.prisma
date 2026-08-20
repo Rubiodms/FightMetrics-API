@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "../docs/erd.svg"
+  theme    = "forest"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Sport {
+  MMA
+  BJJ
+  MUAY_THAI
+  BOXING
+  WRESTLING
+  OTHER
+}
+
+enum TrainingType {
+  GRAPPLING
+  STRIKING
+  MMA_SPARRING
+  STRENGTH
+  POWER
+  CONDITIONING
+  MOBILITY
+  WORK_SHIFT
+  OTHER
+}
+
+enum FatigueZone {
+  GREEN
+  YELLOW
+  RED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  bodyweightKg Float?
+  sport        Sport    @default(MMA)
+  timezone     String   @default("America/Bogota")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  trainingLogs  TrainingLog[]
+  checkIns      DailyCheckIn[]
+  fatigueScores FatigueScore[]
+}
+
+model TrainingLog {
+  id          String       @id @default(cuid())
+  userId      String
+  date        DateTime
+  type        TrainingType
+  durationMin Int
+  rpe         Int
+  sessionLoad Float
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@index([userId, type, date])
+}
+
+model DailyCheckIn {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime
+  sleepHours     Float
+  sleepQuality   Int
+  muscleSoreness Int
+  energyLevel    Int
+  stressLevel    Int
+  bodyweightKg   Float?
+  notes          String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model FatigueScore {
+  id             String      @id @default(cuid())
+  userId         String
+  date           DateTime
+  acuteLoad      Float
+  chronicLoad    Float
+  acwr           Float
+  monotony       Float
+  strain         Float
+  recoveryIndex  Float
+  score          Float
+  zone           FatigueZone
+  recommendation String
+  computedAt     DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
