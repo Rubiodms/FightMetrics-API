@@ -6,6 +6,15 @@ generator erd {
   provider = "prisma-erd-generator"
   output   = "../docs/erd.svg"
   theme    = "forest"
+  // Ruta a un archivo JSON con las opciones de Puppeteer.launch() — no
+  // acepta un objeto inline aca, el generador exige la ruta a un archivo
+  // que exista (ver node_modules/prisma-erd-generator/README.md).
+  // OJO: a diferencia de `output`, esta ruta NO se resuelve relativa a
+  // este schema.prisma, sino relativa al cwd desde donde se corre
+  // `prisma generate` (la raiz del repo en nuestros scripts de npm).
+  // --no-sandbox es necesario porque el runner de GitHub Actions no
+  // expone el sandbox de Chromium sin privilegios adicionales.
+  puppeteerConfig = "./prisma/erd-puppeteer.config.json"
 }
 
 datasource db {
@@ -95,19 +104,22 @@ model DailyCheckIn {
 }
 
 model FatigueScore {
-  id             String      @id @default(cuid())
-  userId         String
-  date           DateTime
-  acuteLoad      Float
-  chronicLoad    Float
-  acwr           Float
-  monotony       Float
-  strain         Float
-  recoveryIndex  Float
-  score          Float
-  zone           FatigueZone
+  id          String @id @default(cuid())
+  userId      String
+  date        DateTime
+  acuteLoad   Float
+  chronicLoad Float
+  // Nullable: se degradan a null en vez de reventar cuando no hay datos
+  // suficientes (chronicLoad=0, desviacion estandar=0 en la semana, sin
+  // check-in reciente). Ver docs/superpowers/specs/2026-08-20-fatigue-algorithm-design.md
+  acwr           Float?
+  monotony       Float?
+  strain         Float?
+  recoveryIndex  Float?
+  score          Float?
+  zone           FatigueZone?
   recommendation String
-  computedAt     DateTime    @default(now())
+  computedAt     DateTime     @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

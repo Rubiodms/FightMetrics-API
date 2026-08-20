@@ -1,14 +1,12 @@
 import { Router } from 'express';
+import { getToday } from './fatigue.controller';
+import { authMiddleware } from '../../shared/middlewares/auth.middleware';
+import { asyncHandler } from '../../shared/utils/async-handler';
 
-// TODO: implementar en el siguiente sprint
 const router = Router();
 
-router.all('/', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.use(authMiddleware);
 
-router.all('/*splat', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.get('/today', asyncHandler(getToday));
 
 export default router;
