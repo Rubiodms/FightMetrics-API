@@ -1,14 +1,18 @@
 import { Router } from 'express';
+import { createOrUpdate, getById, list, remove, update } from './check-ins.controller';
+import { createCheckInSchema, updateCheckInSchema } from './check-ins.schema';
+import { authMiddleware } from '../../shared/middlewares/auth.middleware';
+import { validateBody } from '../../shared/middlewares/validate.middleware';
+import { asyncHandler } from '../../shared/utils/async-handler';
 
-// TODO: implementar en el siguiente sprint
 const router = Router();
 
-router.all('/', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.use(authMiddleware);
 
-router.all('/*splat', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.post('/', validateBody(createCheckInSchema), asyncHandler(createOrUpdate));
+router.get('/', asyncHandler(list));
+router.get('/:id', asyncHandler(getById));
+router.patch('/:id', validateBody(updateCheckInSchema), asyncHandler(update));
+router.delete('/:id', asyncHandler(remove));
 
 export default router;

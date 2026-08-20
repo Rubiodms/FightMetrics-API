@@ -1,14 +1,18 @@
 import { Router } from 'express';
+import { create, getById, list, remove, update } from './training-logs.controller';
+import { createTrainingLogSchema, updateTrainingLogSchema } from './training-logs.schema';
+import { authMiddleware } from '../../shared/middlewares/auth.middleware';
+import { validateBody } from '../../shared/middlewares/validate.middleware';
+import { asyncHandler } from '../../shared/utils/async-handler';
 
-// TODO: implementar en el siguiente sprint
 const router = Router();
 
-router.all('/', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.use(authMiddleware);
 
-router.all('/*splat', (_req, res) => {
-  res.status(501).json({ error: { message: 'No implementado todavía', statusCode: 501 } });
-});
+router.post('/', validateBody(createTrainingLogSchema), asyncHandler(create));
+router.get('/', asyncHandler(list));
+router.get('/:id', asyncHandler(getById));
+router.patch('/:id', validateBody(updateTrainingLogSchema), asyncHandler(update));
+router.delete('/:id', asyncHandler(remove));
 
 export default router;
